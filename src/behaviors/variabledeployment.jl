@@ -1,6 +1,7 @@
 using JuMP: @variable, GenericAffExpr, set_upper_bound, set_lower_bound, set_start_value
 using ArgCheck: @argcheck
 
+using Nosy: Component
 using Nosy: getcapacitybehavior, hasport, hasmodifier, getport, VAL, name, modifiername, _to_affexpr
 
 import Nosy: buildbehavior, _apply_constraints!, behaviorname, _portname, _modifier

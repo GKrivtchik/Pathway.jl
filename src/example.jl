@@ -2,7 +2,7 @@ using Nosy, HiGHS
 
 function test()
 
-    o = PathOpt(2020:10:2040, 0.05, 2020, 2100, TimeMesh(), Dict(2015 => Dict("PV" => 10), 2016 => Dict("PV" => 5, "battery" => 12)))
+    o = PathOpt(2020:10:2040, 0.05, 2020, 2100, TimeMesh(), ini=[(2010, "PV", 100, 25), (2010, "battery", 50, 15), (2015, "PV", 200, 25)])
 
     p = Path(o)
 
@@ -65,10 +65,10 @@ function test()
         finalize!(snapshot)    
     end
 
-    updatecapacity!(p)
-    apply_dynamic_constraints!(p)
     # Optimization
-    # Nosy.optimize!(snapshot, cost)
+    obj = sum(d[:deployment] for d in values(_singlecost(p, "PV", :capex))) + sum(d[:deployment] for d in values(_singlecost(p, "battery", :capex)))
+
+    optimize!(p, obj)
     # result = extract(snapshot)
 
     return p

@@ -1,6 +1,8 @@
 using OrderedCollections: LittleDict
 using Memoize
 
+using Nosy: Sim
+
 using JuMP
 using Gurobi, HiGHS
 

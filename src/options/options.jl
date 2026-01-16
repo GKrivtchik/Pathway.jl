@@ -1,5 +1,7 @@
 using OrderedCollections: LittleDict
-using ArgCheck
+using ArgCheck: @argcheck
+
+using Nosy: TimeMesh
 
 using Infiltrator
 
@@ -24,12 +26,11 @@ struct PathOpt
             mesh = LittleDict(y => mesh for y in years)
         end
 
-        if isnothing(ini)
-            ini = Dict{String,Float64}() # initialization of capacity to empty Dict
-        else
-            re_ini = LittleDict{Int64,Dict{String,Float64}}()
-            for (y, d) in sort(ini)
-                re_ini[y] = Dict(k => Float64(v) for (k,v) in d) # cleanup structure & sort
+        re_ini = InitialCapacity(ini)
+        @argcheck all(y < first(years) for y in keys(re_ini.capacities)) "initial capacities can only be defined for years before or equal to first snapshot year"
+        for (y, v) in re_ini.capacities
+            for tech in v
+                @argcheck tech.lifetime + y >= first(years) "initialized capacity for component $(tech.cname) in year $y has expired before first snapshot year $(first(years))"
             end
         end
 

@@ -12,7 +12,16 @@ The time ratio means the share of the lifetime of the component present before t
 """
 function _deployment(p::Path{T}, cname::String, year::Int) where T
     dep = Dict{Int64,Tuple{T,Float64}}()
-    if year > p.opt.endyear || (!(year in p.opt.years) && year < lastsnapshotyear(p))
+    if year < first(years(p.opt))
+        # check for initialization
+        if haskey(p.opt.ini.capacities, year)
+            for tech in p.opt.ini.capacities[year]
+                if tech.cname == cname
+                    dep[year] = (T(tech.capacity), 0.) # initialized capacity has no cost
+                end
+            end
+        end
+    elseif year > p.opt.endyear || (!(year in p.opt.years) && year < lastsnapshotyear(p))
         nothing
     elseif year in p.opt.years
         snap = getsnapshot(p, year)
@@ -53,7 +62,6 @@ function _deployment(p::Path{T}, cname::String, year::Int) where T
                             dep[y] = (deployment(p, cname, y), 1.)
                         else
                             r = p.opt.endyear - (y+div(year-y, _lifetime(l))*_lifetime(l)) # number of remaining years, not present in the path
-                            println(y)
                             ratio = sum((1+p.opt.discountrate)^-l for l in 0:r) / sum((1+p.opt.discountrate)^-l for l in 0:(_lifetime(l)-1)) # sum of discount until end of remaining time / sum of discount until end of lifetime
                             dep[y] = (deployment(p, cname, y), ratio) # recursive call, but this one lands on a straightforward case because y is a snapshot year. No multiple recursion.
                         end

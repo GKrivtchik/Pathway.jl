@@ -71,10 +71,10 @@ _apply_constraints!(::Component, ::SingleCostBehavior) = nothing
 function _singlecost(p::Path{T}, cname::String, type::Symbol) where T
     d = OrderedDict{Int64,Dict{Symbol,T}}() # Dict of year => (type => cost)
     
-    ddep = OrderedDict(y => _deployment(p, cname, y) for y in (first(p.opt.years)-10):p.opt.endyear) #TODO: replace -10 with biggest anticipation
+    ddep = OrderedDict(y => _deployment(p, cname, y) for y in first(p.opt.years):p.opt.endyear) # NB currently ini has zero single cost, so iteration could be limited to years starting first snapshot year
 
     # initialization of all yearly dict
-    for (y,_) in ddep
+    for y in allyears(p)
         d[y] = Dict(:deployment => zero(T), :retirement => zero(T))
     end
 

@@ -1,7 +1,0 @@
-"""
-Time-dependent constraints.
-"""
-
-
-
-
