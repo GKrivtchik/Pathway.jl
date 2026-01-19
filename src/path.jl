@@ -45,7 +45,10 @@ allyears(p::Path) = firstyear(p):lastyear(p)
 firstsnapshotyear(p::Path) = minimum(p.opt.years)
 lastsnapshotyear(p::Path) = maximum(p.opt.years)
 snapshotyears(p::Path) = p.opt.years
-snapshotyear(p::Path, year::Int) = maximum(y for y in p.opt.years if y <= year)
+function snapshotyear(p::Path, year::Int)
+    @argcheck year >= firstsnapshotyear(p) "No snapshot before $(firstsnapshotyear(p))"
+    return maximum(y for y in p.opt.years if y <= year)
+end
 
 function alltech(p::Path; cwith=Symbol[], cwithout=Symbol[], nwith=Symbol[], nwithout=Symbol[])
     tech = Set{String}()

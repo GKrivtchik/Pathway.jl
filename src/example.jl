@@ -57,6 +57,7 @@ function test()
                 VariableRetirement("input", energy),
                 SingleCost(:capex, :deployment, "input", energy, 30000, Dict(-1=>0.5, 0=>0.5)), # Behavior: annualized fixed cost, tagged as capex, associated with the capacity of the input of the battery (in €/MW)
                 Duration(6), # Behavior: battery duration is 6 hours (i.e. level capacity = 6 * input capacity; output capacity = level capacity)
+                VariableCost(:variable, "input", energy, 1.),
                 Lifetime(20),
             ]
         )

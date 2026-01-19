@@ -43,9 +43,9 @@ struct SingleCostBehavior{T<:VAL,M<:Function} <: AbstractCostBehavior{T}
     val::T
 end
 
-function buildbehavior(c::Component, b::SingleCost)
+function buildbehavior(c::Component{T}, b::SingleCost) where T
     if b.operation == :deployment
-        cap = uniquebehavior(c, AbstractDeploymentBehavior)
+        cap = uniquebehavior(c, AbstractDeploymentBehavior{T})
         @argcheck b.pname == cap.data.pname "Deployment behavior uses a different port"
         @argcheck b.modifier == cap.data.modifier "Deployment behavior uses a different modifier"
         val = _deployment(cap)
@@ -123,19 +123,15 @@ function __singlecost(snap::MetaSnapshot, b::SingleCostBehavior, year::Int, o::P
     return __singlecost(b, deltay, type) * discount
 end
 
-function _singlecost(p::Path{T}, cname::String, year::Int, operation::Symbol; type::Union{Nothing,Symbol}=nothing) where T
+function _singlecost(p::Path{T}, cname::String, year::Int, type::Union{Nothing,Symbol}) where T
     # find all occurrences of the component named cname in all snapshots
     val = zero(T)
     for (y,snap) in p
         c = getcomponent(snap.snap, cname)
         vb = Nosy.behaviors(c, SingleCostBehavior{T})
         for b in vb
-            if b.data.operation == operation
-                val = Nosy.addto!(val, __singlecost(snap, b, year, p.opt, type))
-            end
+            val = Nosy.addto!(val, __singlecost(snap, b, year, p.opt, type))
         end
     end
     return val
 end
-
-deploymentcost(p::Path, cname::String, year::Int; type::Union{Nothing,Symbol}=nothing) = _singlecost(p, cname, year, :deployment, type=type)
