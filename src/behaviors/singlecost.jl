@@ -68,7 +68,7 @@ _apply_constraints!(::Component, ::SingleCostBehavior) = nothing
 # memoize this function 
 # this function builds once and for all the Dict of deployment costs, at all times
 # it will be used to then generate the deployment costs at specific times
-function _singlecost(p::Path{T}, cname::String, type::Symbol) where T
+function _singlecost(p::Path{T}, cname::String, type::Union{Nothing,Symbol}) where T
     d = OrderedDict{Int64,Dict{Symbol,T}}() # Dict of year => (type => cost)
     
     ddep = OrderedDict(y => _deployment(p, cname, y) for y in first(p.opt.years):p.opt.endyear) # NB currently ini has zero single cost, so iteration could be limited to years starting first snapshot year

@@ -42,6 +42,7 @@ function test()
                 VariableDeployment("output", energy),
                 VariableRetirement("output", energy),
                 SingleCost(:capex, :deployment, "output", energy, 50000, Dict(-2 =>0.333, -1=>0.333, 0=>0.333)),
+                FixedCost(:fom, "output", energy, 100.),
                 Lifetime(7),
             ]
         )
@@ -57,7 +58,8 @@ function test()
                 VariableRetirement("input", energy),
                 SingleCost(:capex, :deployment, "input", energy, 30000, Dict(-1=>0.5, 0=>0.5)), # Behavior: annualized fixed cost, tagged as capex, associated with the capacity of the input of the battery (in €/MW)
                 Duration(6), # Behavior: battery duration is 6 hours (i.e. level capacity = 6 * input capacity; output capacity = level capacity)
-                VariableCost(:variable, "input", energy, 1.),
+                VariableCost(:vom, "output", energy, 1.),
+                FixedCost(:fom, "input", energy, 100.),
                 Lifetime(20),
             ]
         )
@@ -67,7 +69,7 @@ function test()
     end
 
     # Optimization
-    obj = sum(d[:deployment] for d in values(_singlecost(p, "PV", :capex))) + sum(d[:deployment] for d in values(_singlecost(p, "battery", :capex)))
+    obj = cost(p)
 
     optimize!(p, obj)
     # result = extract(snapshot)
