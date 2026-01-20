@@ -34,9 +34,3 @@ function add_dynamic_constraint_capacity!(p::Path, cname::String)
 end
 
 _previouscapacity(p::Path, cname::String, y::Int64) = capacity(p, cname, y-1) # y-1 may fall back to either initialization or previous snapshot
-
-
-# cap holds values for 1 cname
-function add_dynamic_constraint_lifetime!(p::Path{T}, cname::String) where T
-    throw(AssertionError("Not implemented"))
-end
