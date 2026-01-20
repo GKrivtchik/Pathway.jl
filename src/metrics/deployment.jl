@@ -1,8 +1,8 @@
 using Nosy: hascomponent
 
-function deployment(p::Path, cname::String, year::Int)
+function deployment(p::Path{T}, cname::String, year::Int) where T
     d = _deployment(p, cname, year)
-    return sum(first(v) for v in values(d))
+    return sum([first(v) for v in values(d)], init=zero(T))
 end
 
 """
