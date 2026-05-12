@@ -2,7 +2,7 @@
 Path optimization.
 """
 
-using JuMP: set_objective
+using JuMP: MIN_SENSE, set_objective
 
 import JuMP: optimize!
 

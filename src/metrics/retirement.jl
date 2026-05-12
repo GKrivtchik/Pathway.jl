@@ -1,5 +1,10 @@
-using Nosy: hascomponent
+using Nosy: hascomponent, getcomponent, uniquebehavior
 
+"""
+    retirement(path, cname, year)
+
+Return the total capacity of component `cname` retired in `year`.
+"""
 function retirement(p::Path, cname::String, year::Int) # same as _retirement but with cleaner signature
     return _retirement(p, cname, year)
 end

@@ -7,13 +7,26 @@ Time-dependency must be added to all cost metrics.
 
 import Nosy: variablecost, fixedcost, cost
 
+using Nosy: hascomponent
+
 
 # path + cname + year (+type)
 
+"""
+    singlecost(path, cname, year[, type])
+
+Return discounted one-time costs for component `cname` in `year`.
+If `type` is provided, only costs tagged with that symbol are included.
+"""
 function singlecost(p::Path, cname::String, year::Int, type::Union{Nothing,Symbol}=nothing) # Pathway only
     _singlecost(p, cname, year, type)
 end
 
+"""
+    variablecost(path, cname, year[, type])
+
+Return discounted variable operating costs for component `cname` in `year`.
+"""
 function variablecost(p::Path{T}, cname::String, year::Int, type::Union{Nothing, Symbol}=nothing) where T # based on Nosy. Same implementation as fixedcost.
     # variable costs are assumed to be zero before the next snapshot
     if year < firstsnapshotyear(p)
@@ -22,6 +35,7 @@ function variablecost(p::Path{T}, cname::String, year::Int, type::Union{Nothing,
 
     # get the Nosy variable cost, then discount it against baseyear
     snap = getsnapshot(p, snapshotyear(p, year))
+    hascomponent(snap, cname) || return zero(T)
     disc = discount(p.opt, year)
     if isnothing(type)
         c = Nosy.variablecost(snap, cname)
@@ -31,6 +45,11 @@ function variablecost(p::Path{T}, cname::String, year::Int, type::Union{Nothing,
     return c * disc
 end
 
+"""
+    fixedcost(path, cname, year[, type])
+
+Return discounted fixed operating costs for component `cname` in `year`.
+"""
 function fixedcost(p::Path{T}, cname::String, year::Int, type::Union{Nothing,Symbol}=nothing) where T # based on Nosy. Same implementatio nas variablecost.
     # fixed costs are assumed to be zero before the next snapshot
     if year < firstsnapshotyear(p)
@@ -39,6 +58,7 @@ function fixedcost(p::Path{T}, cname::String, year::Int, type::Union{Nothing,Sym
 
     # get the Nosy fixed cost, then discount it against baseyear
     snap = getsnapshot(p, snapshotyear(p, year))
+    hascomponent(snap, cname) || return zero(T)
     disc = discount(p.opt, year)
     if isnothing(type)
         c = Nosy.fixedcost(snap, cname)
@@ -49,6 +69,11 @@ function fixedcost(p::Path{T}, cname::String, year::Int, type::Union{Nothing,Sym
     return c * disc
 end
 
+"""
+    cost(path, cname, year[, type])
+
+Return discounted total cost for component `cname` in `year`.
+"""
 cost(p::Path, cname::String, year::Int, type::Union{Nothing,Symbol}=nothing) = singlecost(p, cname, year, type) + fixedcost(p, cname, year, type) + variablecost(p, cname, year, type)
 
 

@@ -1,5 +1,10 @@
-using Nosy: hascomponent
+using Nosy: hascomponent, getcomponent, Snapshot, uniquebehavior
 
+"""
+    deployment(path, cname, year)
+
+Return the total capacity of component `cname` deployed in `year`.
+"""
 function deployment(p::Path{T}, cname::String, year::Int) where T
     d = _deployment(p, cname, year)
     return sum([first(v) for v in values(d)], init=zero(T))

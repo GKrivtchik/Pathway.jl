@@ -2,9 +2,34 @@
 Path capacity constraints.
 """
 
+using Nosy: getcomponents, hascomponent, getcomponent, hasbehavior
+
+# Dynamic capacity constraints should apply only to component names that carry
+# Pathway deployment/retirement event behaviors. Fixed-only snapshot components
+# remain ordinary Nosy components and are not connected through time.
+function _dynamic_capacity_components(p::Path)
+    components = Set{String}()
+    for y in snapshotyears(p)
+        snap = getsnapshot(p, y)
+        for (cname, c) in getcomponents(snap)
+            if hasbehavior(c, AbstractDeploymentBehavior) || hasbehavior(c, AbstractRetirementBehavior)
+                push!(components, String(cname))
+            end
+        end
+    end
+    return sort(collect(components))
+end
+
+function _has_dynamic_capacity_event(p::Path, cname::String, y::Int)
+    snap = getsnapshot(p, y)
+    hascomponent(snap, cname) || return false
+    c = getcomponent(snap, cname)
+    return hasbehavior(c, AbstractDeploymentBehavior) || hasbehavior(c, AbstractRetirementBehavior)
+end
+
 function add_dynamic_constraint_capacity!(p::Path)
-    for cname in alltech(p; cwith=[:capacity], cwithout=Symbol[], nwith=Symbol[], nwithout=Symbol[])
-        add_dynamic_constraint_capacity!(p, String(cname))
+    for cname in _dynamic_capacity_components(p)
+        add_dynamic_constraint_capacity!(p, cname)
     end
 end
 
@@ -15,10 +40,13 @@ struct Capacity{T}
 end
 
 
-function _makecapacity(p::Path, cname::String)
-    cap = OrderedDict(y => capacity(p, cname, y) for y in snapshotyears(p))
-    dep = OrderedDict(y => deployment(p, cname, y) for y in snapshotyears(p))
-    ret = OrderedDict(y => retirement(p, cname, y) for y in snapshotyears(p))
+function _makecapacity(p::Path{T}, cname::String) where T
+    # Fixed first-snapshot capacities are numeric, while later capacities may be
+    # JuMP affine expressions. Convert all terms to the path expression type so
+    # the three OrderedDicts can share one Capacity{T}.
+    cap = OrderedDict{Int64,T}(y => convert(T, capacity(p, cname, y)) for y in snapshotyears(p))
+    dep = OrderedDict{Int64,T}(y => convert(T, deployment(p, cname, y)) for y in snapshotyears(p))
+    ret = OrderedDict{Int64,T}(y => convert(T, retirement(p, cname, y)) for y in snapshotyears(p))
     return Capacity(cap, dep, ret)
 end
 
@@ -26,6 +54,9 @@ end
 function add_dynamic_constraint_capacity!(p::Path, cname::String)
     cap = _makecapacity(p, cname)
     for y in snapshotyears(p)
+        if y == firstsnapshotyear(p) && !_has_dynamic_capacity_event(p, cname, y)
+            continue
+        end
         @constraint(
             p.sim.model,
             cap.cap[y] == cap.dep[y] - cap.ret[y] + _previouscapacity(p, cname, y)

@@ -2,7 +2,7 @@
 Dynamic retiring constraints.
 """
 
-using Nosy: getcomponent, hasbehavior, uniquebehavior
+using Nosy: getcomponent, hascomponent, hasbehavior, uniquebehavior
 
 function add_dynamic_constraint_lifetime!(p::Path)
     for cname in alltech(p; cwith=[:capacity], cwithout=Symbol[], nwith=Symbol[], nwithout=Symbol[])
@@ -26,7 +26,9 @@ function add_dynamic_constraint_lifetime!(p::Path{T}, cname::String) where T
 
         for _y in snapshotyears(p)
             if _y < y
-                c = getcomponent(getsnapshot(p, _y), cname)
+                snap = getsnapshot(p, _y)
+                hascomponent(snap, cname) || continue
+                c = getcomponent(snap, cname)
                 if hasbehavior(c, LifetimeBehavior{T})
                     _l = Nosy.uniquebehavior(c, LifetimeBehavior{T})
                     if _y + _lifetime(_l) <= y

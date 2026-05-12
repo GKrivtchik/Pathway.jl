@@ -8,7 +8,7 @@ using ArgCheck
 using OrderedCollections: OrderedDict
 using Memoize: @memoize
 
-using Nosy: getcomponent
+using Nosy: getcomponent, hascomponent
 using Nosy: AbstractCostBehaviorData, AbstractCostBehavior
 using Nosy: VAL, exptype
 using Nosy: uniquebehavior
@@ -33,7 +33,7 @@ struct SingleCost{M<:Function} <: AbstractCostBehaviorData
         @argcheck operation in (:deployment, :retiring) "operation must be either :deployment or :retiring"
         
         isnothing(profile) && (profile = Dict(0 => 1.))
-        @argcheck isapprox(sum(values(profile)), 1., atol=0.001) "Sum of profile values must be equal to zero"
+        @argcheck isapprox(sum(values(profile)), 1., atol=0.001) "Sum of profile values must be equal to one"
         new{typeof(modifier)}(type, operation, pname, modifier, val, profile)
     end
 end
@@ -89,8 +89,11 @@ function _singlecost(p::Path{T}, cname::String, type::Union{Nothing,Symbol}) whe
                 for b in vb
                     for op in (:deployment, :retirement)
                         if b.data.operation == op
+                            (isnothing(type) || b.data.type == type) || continue
                             for (deltay, invratio) in b.data.profile
-                                d[y+deltay][op] += __singlecost(p.snap[snapyear], b, y+deltay, p.opt, type) * ratio * invratio * discount(p.opt, y+deltay)
+                                costyear = y + deltay
+                                haskey(d, costyear) || continue
+                                d[costyear][op] += b.val * ratio * invratio * discount(p.opt, costyear)
                             end
                         end
                     end
@@ -102,7 +105,11 @@ function _singlecost(p::Path{T}, cname::String, type::Union{Nothing,Symbol}) whe
 end
 
 
+"""
+    discount(opt, year)
 
+Return the discount factor from `year` to `opt.baseyear`.
+"""
 discount(o::PathOpt, year::Int) = (1. + o.discountrate)^(o.baseyear - year)
 
 # return the non-discounted cost associated with a SingleCost, at a year shifted by deltayear from current year
@@ -127,6 +134,7 @@ function _singlecost(p::Path{T}, cname::String, year::Int, type::Union{Nothing,S
     # find all occurrences of the component named cname in all snapshots
     val = zero(T)
     for (y,snap) in p
+        hascomponent(snap.snap, cname) || continue
         c = getcomponent(snap.snap, cname)
         vb = Nosy.behaviors(c, SingleCostBehavior{T})
         for b in vb

@@ -7,6 +7,13 @@ using OrderedCollections: OrderedDict
 
 # one initialization entry
 # there can be multiple entries per component, for different years
+"""
+    HistoricalCapacity(cname, capacity, lifetime)
+
+Historical installed capacity for component `cname`.
+`capacity` uses the same unit as the component capacity and `lifetime` is the
+technical lifetime in years.
+"""
 mutable struct HistoricalCapacity
     cname::String
     capacity::Float64 # in same unit / modifier as the component capacity
@@ -15,9 +22,20 @@ end
 
 # collection of initialization entries
 # wrapper to hold an ordered dictionary of year => HistoricalCapacity
+"""
+    InitialCapacity(entries)
+
+Historical capacity indexed by installation year.
+
+`entries` can be tuples `(year, cname, capacity, lifetime)` or named tuples
+with fields `year`, `cname`, `capacity`, and `lifetime`.
+"""
 struct InitialCapacity
     capacities::OrderedDict{Int64, Vector{HistoricalCapacity}}
 end
+
+InitialCapacity() = InitialCapacity([])
+InitialCapacity(ini::InitialCapacity) = ini
 
 """
     InitialCapacity(v::AbstractVector)
@@ -43,7 +61,16 @@ function InitialCapacity(v::AbstractVector)
         push!(d[y], HistoricalCapacity(cname, Float64(cap), Int64(lifetime)))
     end
 
-    return InitialCapacity(sort(d))
+    return InitialCapacity(OrderedDict(y => d[y] for y in sort(collect(keys(d)))))
+end
+
+function InitialCapacity(v::AbstractVector{<:NamedTuple})
+    return InitialCapacity([(
+        e.year,
+        e.cname,
+        e.capacity,
+        e.lifetime,
+    ) for e in v])
 end
 
 # example of initialization vector:

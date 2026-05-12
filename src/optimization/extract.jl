@@ -3,7 +3,7 @@ Pathway extraction.
 """
 
 import Nosy: extract, _extract
-using JuMP: GenericAffExpr
+using JuMP: GenericAffExpr, OPTIMIZE_NOT_CALLED, is_solved_and_feasible, termination_status
 
 function extract(p::Path{<:GenericAffExpr})
     m = p.sim.model

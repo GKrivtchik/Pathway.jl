@@ -2,7 +2,7 @@
 Path capacity metrics.
 """
 
-using Nosy: addto!
+using Nosy: addto!, hascomponent
 
 import Nosy: capacity
 
@@ -27,10 +27,22 @@ function _capacity(p::Path{T}, cname::String, year::Int) where T
         return val
     elseif year <= lastyear(p)
         snap = getsnapshot(p, snapshotyear(p,year)) # fall back to previous snapshot is not a snapshot year
+        # A technology may appear only in later pathway snapshots. In earlier
+        # snapshots, absence means zero installed capacity, not a modeling error.
+        hascomponent(snap, cname) || return zero(T)
         return Nosy.capacity(snap, cname)
     else #if p > lastyear(p)
         return zero(T)
     end
 end
 
+"""
+    capacity(path, cname, year)
+
+Return the installed capacity of component `cname` in `year`.
+
+Before the first snapshot year, this is based on historical capacity. Between
+snapshot years, Pathway uses the latest previous snapshot. After the model
+horizon, capacity is zero.
+"""
 capacity(p::Path, cname::String, year::Int) = _capacity(p, cname, year) # cleaner signature

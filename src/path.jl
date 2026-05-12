@@ -1,9 +1,18 @@
 using ArgCheck
 
-using Nosy: AbstractElement
+using Nosy: AbstractElement, Snapshot, getnodes, getcomponents
 
-import Nosy: finalize!
+import Nosy: finalize!, model, sim
 
+"""
+    Path(opt::PathOpt; kwargs...)
+
+A multi-year pathway made of one Nosy `Snapshot` per snapshot year and one
+shared JuMP model.
+
+Keyword arguments are forwarded to `PathSim`, for example
+`Path(opt; optimizer=HiGHS.Optimizer)`.
+"""
 struct Path{T} <: AbstractElement{T}
     opt::PathOpt
     sim::PathSim
@@ -12,23 +21,72 @@ struct Path{T} <: AbstractElement{T}
 
     function Path(opt::PathOpt, sim::PathSim, snap::AbstractDict{Int64,MetaSnapshot{T}}, finalized::Ref{Bool}=Ref(false)) where T
         @argcheck years(opt) == sort(collect(keys(snap))) "snapshot years do not match PathOpt years"
-        new{T}(opt, sim, sort(snap), finalized) # invariant: years are sorted at constructor
+        ordered_snap = OrderedDict{Int64,MetaSnapshot{T}}(y => snap[y] for y in sort(collect(keys(snap))))
+        new{T}(opt, sim, ordered_snap, finalized) # invariant: years are sorted at constructor
     end
 end
 
+"""
+    getsnapshot(path, year)
+
+Return the Nosy `Snapshot` for snapshot `year`.
+"""
 function getsnapshot(p::Path{T}, y::Int) where T
     @argcheck y in p.opt.years "y not in path years"
     return p.snap[y].snap::Snapshot{T}
 end
 
-function Path(opt::PathOpt)
-    psim = PathSim(opt)
-    dsnap = OrderedDict([y => MetaSnapshot(y,Snapshot(psim.dsim[y])) for y in years(opt)])
+function Path(opt::PathOpt; kwargs...)
+    psim = PathSim(opt; kwargs...)
+    T = psim.type
+    dsnap = OrderedDict{Int64,MetaSnapshot{T}}()
+    for y in years(opt)
+        dsnap[y] = MetaSnapshot(y, Snapshot(psim.dsim[y]))
+    end
     return Path(opt, psim, dsnap)
+end
+
+"""
+    addsnapshot!(path, year; mesh=nothing)
+    addsnapshot!(path, snapshot, year)
+
+Add a snapshot year to `path` and return the added snapshot.
+
+The first method creates an empty Nosy `Snapshot` using the pathway's shared
+JuMP model. The second method registers an existing `snapshot`; it must use the
+same JuMP model as the pathway.
+"""
+function addsnapshot!(p::Path{T}, year::Int; mesh=nothing) where T
+    @argcheck !_isfinalized(p) "cannot add a snapshot to a finalized path"
+    m = isnothing(mesh) ? p.opt.defaultmesh : mesh
+    s = Sim(p.sim.model, mesh=m, suffix=string(year); p.sim.simkwargs...)
+    snap = Snapshot(s)
+    return addsnapshot!(p, snap, year)
+end
+
+function addsnapshot!(p::Path{T}, snap::Snapshot{T}, year::Int) where T
+    @argcheck !_isfinalized(p) "cannot add a snapshot to a finalized path"
+    @argcheck sim(snap).model === p.sim.model "snapshot must use the pathway JuMP model"
+
+    y = _addyear!(p.opt, year, sim(snap).mesh)
+    p.sim.dsim[y] = sim(snap)
+    _sort_ordered_dict!(p.sim.dsim)
+    p.snap[y] = MetaSnapshot(y, snap)
+    _sort_ordered_dict!(p.snap)
+
+    return snap
 end
 
 # key-value iteration over Path
 Base.iterate(d::Path, st...) = iterate(pairs(d.snap), st...)
+Base.length(p::Path) = length(p.snap)
+Base.keys(p::Path) = keys(p.snap)
+Base.values(p::Path) = values(p.snap)
+Base.haskey(p::Path, y::Int) = haskey(p.snap, y)
+Base.getindex(p::Path, y::Int) = getsnapshot(p, y)
+
+model(p::Path) = p.sim.model
+sim(p::Path, y::Int) = getsnapshot(p, y).sim
 
 """
     firstyear(p::Path)
@@ -41,17 +99,57 @@ function firstyear(p::Path)
         return minimum(keys(p.opt.ini.capacities)) # first initialization year
     end
 end
+"""
+    lastyear(path)
+
+Return the final model year configured in `path`.
+"""
 lastyear(p::Path) = p.opt.endyear
+
+"""
+    allyears(path)
+
+Return the full model-year range from `firstyear(path)` to `lastyear(path)`.
+"""
 allyears(p::Path) = firstyear(p):lastyear(p)
 
+"""
+    firstsnapshotyear(path)
+
+Return the first snapshot year.
+"""
 firstsnapshotyear(p::Path) = minimum(p.opt.years)
+
+"""
+    lastsnapshotyear(path)
+
+Return the last snapshot year.
+"""
 lastsnapshotyear(p::Path) = maximum(p.opt.years)
+
+"""
+    snapshotyears(path)
+
+Return the sorted vector of snapshot years.
+"""
 snapshotyears(p::Path) = p.opt.years
+
+"""
+    snapshotyear(path, year)
+
+Return the latest snapshot year less than or equal to `year`.
+"""
 function snapshotyear(p::Path, year::Int)
     @argcheck year >= firstsnapshotyear(p) "No snapshot before $(firstsnapshotyear(p))"
     return maximum(y for y in p.opt.years if y <= year)
 end
 
+"""
+    alltech(path; cwith=[], cwithout=[], nwith=[], nwithout=[])
+
+Return sorted component names appearing in historical capacity or snapshots.
+Optional filters are forwarded to Nosy's node and component tag queries.
+"""
 function alltech(p::Path; cwith=Symbol[], cwithout=Symbol[], nwith=Symbol[], nwithout=Symbol[])
     tech = Set{String}()
 
@@ -70,7 +168,7 @@ function alltech(p::Path; cwith=Symbol[], cwithout=Symbol[], nwith=Symbol[], nwi
         end
     end
 
-    return collect(tech)
+    return sort(collect(tech))
 end
 
 _isfinalized(p::Path) = p.finalized[]
