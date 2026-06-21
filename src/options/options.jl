@@ -3,8 +3,6 @@ using ArgCheck: @argcheck
 
 using Nosy: TimeMesh
 
-using Infiltrator
-
 function _sort_ordered_dict!(d::OrderedDict)
     entries = sort(collect(d); by=first)
     empty!(d)
