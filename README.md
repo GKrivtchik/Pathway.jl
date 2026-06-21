@@ -17,6 +17,9 @@ Pathway re-exports the common Nosy API, so most small models can start with:
 using Pathway
 ```
 
+The full documentation is built with Documenter.jl and is available at
+<https://GKrivtchik.github.io/Pathway.jl/dev/>.
+
 ## Highlights
 
 - Build multi-year capacity expansion pathways from familiar Nosy snapshots.
@@ -30,8 +33,8 @@ using Pathway
 
 ## Requirements
 
-Pathway requires Nosy and a JuMP-compatible LP/MILP solver. Pass the optimizer
-constructor when constructing a `Path`:
+Pathway requires Julia 1.12, Nosy, and a JuMP-compatible LP/MILP solver. Pass
+the optimizer constructor when constructing a `Path`:
 
 ```julia
 using Pathway
@@ -55,7 +58,7 @@ using JuMP: set_silent, value
 
 demand_by_year = [2020 => 10, 2030 => 20]
 
-opt = PathOpt(; mesh=TimeMesh(fill(1 // 1, 2)))
+opt = PathOpt(; mesh=TimeMesh(fill(1 // 1, 2)), endyear=2040)
 path = Path(HiGHS.Optimizer, opt)
 set_silent(model(path))
 
@@ -128,14 +131,10 @@ Pathway extends Nosy metrics with year-aware methods:
 Aggregated forms such as `cost(path)` and `cost(path, :capex)` are also
 available.
 
-## Documentation
+## License
 
-The documentation sources live in [`docs/`](docs/). Build them with:
-
-```julia
-julia --project=docs docs/make.jl
-```
+Pathway is licensed under the [MIT License](LICENSE.md).
 
 ## Authors
 
-Guillaume Krivtchik (OECD - Nuclear Energy Agency)
+Guillaume Krivtchik
