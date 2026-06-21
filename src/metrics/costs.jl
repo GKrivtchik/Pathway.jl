@@ -1,5 +1,5 @@
 """
-Pathway-style cost metrics.
+EnergyPathway-style cost metrics.
 
 Costs are initially defined in Nosy for snapshots. However, some costs (investment) must be reimplemented.
 Time-dependency must be added to all cost metrics.
@@ -18,7 +18,7 @@ using Nosy: hascomponent
 Return discounted one-time costs for component `cname` in `year`.
 If `type` is provided, only costs tagged with that symbol are included.
 """
-function singlecost(p::Path, cname::String, year::Int, type::Union{Nothing,Symbol}=nothing) # Pathway only
+function singlecost(p::Path, cname::String, year::Int, type::Union{Nothing,Symbol}=nothing) # EnergyPathway only
     _singlecost(p, cname, year, type)
 end
 

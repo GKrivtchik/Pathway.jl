@@ -1,8 +1,8 @@
-# Pathway Concepts
+# EnergyPathway Concepts
 
-Pathway keeps the Nosy modeling philosophy: build systems from carriers, nodes,
-components, model archetypes, and reusable behaviors. It adds only the concepts
-needed to connect snapshots through time.
+EnergyPathway keeps the Nosy modeling philosophy: build systems from carriers,
+nodes, components, model archetypes, and reusable behaviors. It adds only the
+concepts needed to connect snapshots through time.
 
 ## `PathOpt`
 
@@ -91,7 +91,7 @@ still be alive at the first snapshot year.
 
 ## Dynamic Behaviors
 
-Pathway components are ordinary Nosy components with extra behaviors:
+EnergyPathway components are ordinary Nosy components with extra behaviors:
 
 - `VariableDeployment` creates an optimized deployment variable.
 - `FixedDeployment` fixes deployment to a given value.
@@ -114,7 +114,7 @@ SingleCost(:construction, :deployment, "output", energy, 50_000, Dict(-2 => 0.3,
 
 This means 30% of the construction cost is paid two years before deployment,
 40% one year before deployment, and 30% in the deployment year. Profile shares
-must sum to one, and Pathway discounts each payment in its own year.
+must sum to one, and EnergyPathway discounts each payment in its own year.
 
 Dynamic capacity constraints are added only for components that use deployment
 or retirement behaviors. Ordinary fixed Nosy components remain snapshot-local.

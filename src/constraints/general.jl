@@ -1,5 +1,5 @@
 """
-All dynamic constraints for Pathway simulations.
+All dynamic constraints for EnergyPathway simulations.
 """
 
 function apply_dynamic_constraints!(p::Path)

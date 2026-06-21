@@ -5,7 +5,7 @@ Path capacity constraints.
 using Nosy: getcomponents, hascomponent, getcomponent, hasbehavior
 
 # Dynamic capacity constraints should apply only to component names that carry
-# Pathway deployment/retirement event behaviors. Fixed-only snapshot components
+# EnergyPathway deployment/retirement event behaviors. Fixed-only snapshot components
 # remain ordinary Nosy components and are not connected through time.
 function _dynamic_capacity_components(p::Path)
     components = Set{String}()

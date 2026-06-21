@@ -16,7 +16,7 @@ end
     PathOpt(years; discountrate=0.05, baseyear=first(years), endyear=last(years), mesh=TimeMesh(), ini=[])
     PathOpt(years, discountrate, baseyear, endyear, mesh; ini=[])
 
-Temporal options for a Pathway model.
+Temporal options for an EnergyPathway model.
 
 `years` are the snapshot years. `mesh` can be one `TimeMesh` shared by all
 snapshots or a dictionary mapping each snapshot year to a `TimeMesh`. `ini`

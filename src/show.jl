@@ -73,7 +73,7 @@ function Base.show(io::IO, path::Path)
         status = "not finalized"
     end
     horizon = isempty(snapshotyears(path)) ? "open horizon" : "$(firstyear(path))-$(lastyear(path))"
-    print(io, "Pathway with $(length(path)) snapshot year(s) ($(_year_summary(snapshotyears(path)))) over $horizon, $status")
+    print(io, "Energy pathway with $(length(path)) snapshot year(s) ($(_year_summary(snapshotyears(path)))) over $horizon, $status")
 end
 
 function Base.show(io::IO, b::VariableDeployment)

@@ -1,8 +1,8 @@
 # API Reference
 
-This page lists the main Pathway-specific API. Pathway also re-exports the
-common Nosy API for components, nodes, snapshots, carriers, metrics, and
-optimization.
+This page lists the main EnergyPathway-specific API. EnergyPathway also
+re-exports the common Nosy API for components, nodes, snapshots, carriers,
+metrics, and optimization.
 
 ## Options and Path Objects
 

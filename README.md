@@ -1,24 +1,24 @@
-# Pathway.jl
+# EnergyPathway.jl
 
-[![codecov](https://codecov.io/github/GKrivtchik/Pathway.jl/branch/main/graph/badge.svg)](https://app.codecov.io/github/GKrivtchik/Pathway.jl/tree/main)
-[![CI](https://github.com/GKrivtchik/Pathway.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/GKrivtchik/Pathway.jl/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/github/GKrivtchik/EnergyPathway.jl/branch/main/graph/badge.svg)](https://app.codecov.io/github/GKrivtchik/EnergyPathway.jl/tree/main)
+[![CI](https://github.com/GKrivtchik/EnergyPathway.jl/actions/workflows/ci.yml/badge.svg)](https://github.com/GKrivtchik/EnergyPathway.jl/actions/workflows/ci.yml)
 
-Pathway is a capacity expansion pathway layer built on top of
+EnergyPathway is a capacity expansion pathway layer built on top of
 [Nosy.jl](https://github.com/oecd-nea/Nosy.jl).
 
-Nosy describes one optimized energy-system snapshot. Pathway links several
-Nosy snapshots through time, adding deployment, retirement, lifetime, and
-investment-cost logic so that a model can describe how installed capacity
+Nosy describes one optimized energy-system snapshot. EnergyPathway links
+several Nosy snapshots through time, adding deployment, retirement, lifetime,
+and investment-cost logic so that a model can describe how installed capacity
 evolves between years.
 
-Pathway re-exports the common Nosy API, so most small models can start with:
+EnergyPathway re-exports the common Nosy API, so most small models can start with:
 
 ```julia
-using Pathway
+using EnergyPathway
 ```
 
 The full documentation is built with Documenter.jl and is available at
-<https://GKrivtchik.github.io/Pathway.jl/dev/>.
+<https://GKrivtchik.github.io/EnergyPathway.jl/dev/>.
 
 ## Highlights
 
@@ -33,11 +33,11 @@ The full documentation is built with Documenter.jl and is available at
 
 ## Requirements
 
-Pathway requires Julia 1.12, Nosy, and a JuMP-compatible LP/MILP solver. Pass
-the optimizer constructor when constructing a `Path`:
+EnergyPathway requires Julia 1.12, Nosy, and a JuMP-compatible LP/MILP solver.
+Pass the optimizer constructor when constructing a `Path`:
 
 ```julia
-using Pathway
+using EnergyPathway
 using HiGHS
 
 opt = PathOpt()
@@ -52,7 +52,7 @@ two snapshot years. Demand grows from 10 to 20, so the optimal pathway deploys
 10 units in 2020 and 10 more in 2030.
 
 ```julia
-using Pathway
+using EnergyPathway
 using HiGHS
 using JuMP: set_silent, value
 
@@ -107,7 +107,7 @@ Use `addsnapshot!(path, year)` to create a snapshot, or
 the pathway model. Use `path[year]` or `getsnapshot(path, year)` to access a
 registered snapshot.
 
-Pathway components are ordinary Nosy components with additional behaviors:
+EnergyPathway components are ordinary Nosy components with additional behaviors:
 
 - `VariableDeployment` or `FixedDeployment`: capacity additions in a snapshot
   year.
@@ -118,7 +118,7 @@ Pathway components are ordinary Nosy components with additional behaviors:
 
 ## Metrics
 
-Pathway extends Nosy metrics with year-aware methods:
+EnergyPathway extends Nosy metrics with year-aware methods:
 
 - `capacity(path, cname, year)`
 - `deployment(path, cname, year)`
@@ -133,7 +133,7 @@ available.
 
 ## License
 
-Pathway is licensed under the [MIT License](LICENSE.md).
+EnergyPathway is licensed under the [MIT License](LICENSE.md).
 
 ## Authors
 

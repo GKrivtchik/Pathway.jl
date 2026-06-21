@@ -1,29 +1,29 @@
 using Documenter
-using Pathway
+using EnergyPathway
 
 makedocs(
-    sitename="Pathway.jl",
+    sitename="EnergyPathway.jl",
     authors="Guillaume KRIVTCHIK, OECD Nuclear Energy Agency (OECD-NEA)",
-    modules=[Pathway],
+    modules=[EnergyPathway],
     checkdocs=:exports,
-    repo="https://github.com/GKrivtchik/Pathway.jl/blob/{commit}{path}#L{line}",
+    repo="https://github.com/GKrivtchik/EnergyPathway.jl/blob/{commit}{path}#L{line}",
     format=Documenter.HTML(
         prettyurls=get(ENV, "CI", "false") == "true",
-        canonical="https://GKrivtchik.github.io/Pathway.jl/",
-        repolink="https://github.com/GKrivtchik/Pathway.jl",
+        canonical="https://GKrivtchik.github.io/EnergyPathway.jl/",
+        repolink="https://github.com/GKrivtchik/EnergyPathway.jl",
         edit_link="main",
     ),
     pages=[
         "Home" => "index.md",
         "Tutorial" => "tutorial.md",
-        "Pathway Concepts" => "concepts.md",
+        "EnergyPathway Concepts" => "concepts.md",
         "API Reference" => "api.md",
     ],
 )
 
 if get(ENV, "CI", "false") == "true"
     deploydocs(
-        repo="github.com/GKrivtchik/Pathway.jl.git",
+        repo="github.com/GKrivtchik/EnergyPathway.jl.git",
         devbranch="main",
     )
 end

@@ -1,5 +1,5 @@
 """
-Pathway extraction.
+EnergyPathway extraction.
 """
 
 import Nosy: extract, _extract

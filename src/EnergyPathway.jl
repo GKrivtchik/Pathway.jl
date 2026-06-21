@@ -1,7 +1,7 @@
-module Pathway
+module EnergyPathway
 
 """
-Path model, based on Nosy.jl
+Energy pathway model, based on Nosy.jl
 """
 
 using Nosy
@@ -64,4 +64,4 @@ include("optimization/_includes.jl")
 
 include("show.jl")
 
-end # module Pathway
+end # module EnergyPathway

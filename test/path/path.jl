@@ -14,7 +14,7 @@
     empty_path = Path(HiGHS.Optimizer, PathOpt(; mesh=mesh2))
     set_silent(model(empty_path))
     @test isempty(snapshotyears(empty_path))
-    @test occursin("Pathway with 0 snapshot year(s) (no years)", sprint(show, empty_path))
+    @test occursin("Energy pathway with 0 snapshot year(s) (no years)", sprint(show, empty_path))
 
     snap2020 = addsnapshot!(empty_path, 2020)
     @test snap2020 === empty_path[2020]
@@ -44,7 +44,7 @@
     @test path[2020] === getsnapshot(path, 2020)
     @test nsteps(sim(path, 2020)) == 2
     @test alltech(path) == String[]
-    @test occursin("Pathway with 2 snapshot year(s) (2020:10:2030)", sprint(show, path))
+    @test occursin("Energy pathway with 2 snapshot year(s) (2020:10:2030)", sprint(show, path))
     @test sprint(show, path.sim) == "Path simulation (2 snapshot year(s), ScaledOptimizer(HiGHS))"
     @test startswith(sprint(show, path.snap[2020]), "Meta snapshot 2020: Snapshot with 0 component(s)")
     @test snapshotyear(path, 2029) == 2020

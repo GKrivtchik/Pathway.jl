@@ -1,18 +1,18 @@
-# Pathway.jl
+# EnergyPathway.jl
 
-Pathway is a capacity expansion pathway layer built on top of
+EnergyPathway is a capacity expansion pathway layer built on top of
 [Nosy.jl](https://github.com/oecd-nea/Nosy.jl).
 
-Nosy describes one optimized energy-system snapshot. Pathway links several
-Nosy snapshots through time, adding deployment, retirement, lifetime, and
-investment-cost logic so that a model can describe how installed capacity
+Nosy describes one optimized energy-system snapshot. EnergyPathway links
+several Nosy snapshots through time, adding deployment, retirement, lifetime,
+and investment-cost logic so that a model can describe how installed capacity
 evolves between years.
 
 ```julia
-using Pathway
+using EnergyPathway
 ```
 
-## What Pathway Adds
+## What EnergyPathway Adds
 
 - A `Path` object containing one Nosy `Snapshot` per model year.
 - A `PathOpt` object for discounting, model horizon, default time mesh, and
@@ -25,7 +25,7 @@ using Pathway
 
 ## Requirements
 
-Pathway uses JuMP through Nosy. You need a JuMP-compatible LP/MILP solver.
+EnergyPathway uses JuMP through Nosy. You need a JuMP-compatible LP/MILP solver.
 Pass the optimizer constructor when constructing a `Path`:
 
 ```julia
@@ -50,11 +50,11 @@ The same form works with any JuMP optimizer constructor; pass it in place of
 
 ## Author
 
-Pathway is authored by Guillaume KRIVTCHIK at the OECD Nuclear Energy Agency
+EnergyPathway is authored by Guillaume KRIVTCHIK at the OECD Nuclear Energy Agency
 (OECD-NEA).
 
 ## Pages
 
 - [Tutorial](@ref): a complete two-year capacity expansion model.
-- [Pathway Concepts](@ref): the main objects and behaviors.
-- [API Reference](@ref): exported Pathway types and functions.
+- [EnergyPathway Concepts](@ref): the main objects and behaviors.
+- [API Reference](@ref): exported EnergyPathway types and functions.

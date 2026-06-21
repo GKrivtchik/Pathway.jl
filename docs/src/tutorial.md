@@ -8,7 +8,7 @@ deploy in each snapshot year.
 ## Setup
 
 ```julia
-using Pathway
+using EnergyPathway
 using HiGHS
 ```
 
@@ -26,8 +26,8 @@ path = Path(HiGHS.Optimizer, opt)
 
 ## Build Each Snapshot
 
-Each snapshot is an ordinary Nosy system. Pathway re-exports the Nosy API, so
-the code uses `EnergyCarrier`, `Node`, `Component`, `Demand`,
+Each snapshot is an ordinary Nosy system. EnergyPathway re-exports the Nosy API,
+so the code uses `EnergyCarrier`, `Node`, `Component`, `Demand`,
 `DispatchableSource`, and `connect!` directly.
 
 ```julia
@@ -62,7 +62,7 @@ for (year, demand) in demand_by_year
 end
 ```
 
-The important Pathway-specific behaviors are:
+The important EnergyPathway-specific behaviors are:
 
 - `VariableDeployment`: the model can add capacity in a snapshot year.
 - `VariableRetirement`: the model can retire capacity in a snapshot year.

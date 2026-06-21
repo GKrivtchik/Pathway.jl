@@ -1,4 +1,4 @@
-using Pathway
+using EnergyPathway
 
 function test(optimizer)
 

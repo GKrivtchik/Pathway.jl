@@ -42,7 +42,7 @@ end
 Return the installed capacity of component `cname` in `year`.
 
 Before the first snapshot year, this is based on historical capacity. Between
-snapshot years, Pathway uses the latest previous snapshot. After the model
+snapshot years, EnergyPathway uses the latest previous snapshot. After the model
 horizon, capacity is zero.
 """
 capacity(p::Path, cname::String, year::Int) = _capacity(p, cname, year) # cleaner signature
